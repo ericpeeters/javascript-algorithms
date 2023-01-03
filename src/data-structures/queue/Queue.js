@@ -1,19 +1,27 @@
-import LinkedList from '../linked-list/LinkedList';
-
 export default class Queue {
   constructor() {
-    // We're going to implement Queue based on LinkedList since the two
-    // structures are quite similar. Namely, they both operate mostly on
-    // the elements at the beginning and the end. Compare enqueue/dequeue
-    // operations of Queue with append/deleteHead operations of LinkedList.
-    this.linkedList = new LinkedList();
+    this.arr = [];
   }
 
   /**
-   * @return {boolean}
+   * @type {*|null}
    */
-  isEmpty() {
-    return !this.linkedList.head;
+  get back() {
+    return !this.isEmpty ? this.arr[this.arr.length - 1] : null;
+  }
+
+  /**
+   * @type {*|null}
+   */
+  get front() {
+    return !this.isEmpty ? this.arr[0] : null;
+  }
+
+  /**
+   * @type {boolean}
+   */
+  get isEmpty() {
+    return this.arr.length === 0;
   }
 
   /**
@@ -21,20 +29,16 @@ export default class Queue {
    * @return {*}
    */
   peek() {
-    if (this.isEmpty()) {
-      return null;
-    }
-
-    return this.linkedList.head.value;
+    return this.front;
   }
 
   /**
-   * Add a new element to the end of the queue (the tail of the linked list).
+   * Add a new element to the end of the queue
    * This element will be processed after all elements ahead of it.
    * @param {*} value
    */
   enqueue(value) {
-    this.linkedList.append(value);
+    this.arr.push(value);
   }
 
   /**
@@ -43,16 +47,21 @@ export default class Queue {
    * @return {*}
    */
   dequeue() {
-    const removedHead = this.linkedList.deleteHead();
-    return removedHead ? removedHead.value : null;
+    if (this.isEmpty) {
+      return null;
+    }
+
+    return this.arr.shift();
   }
 
   /**
    * @param [callback]
    * @return {string}
    */
-  toString(callback) {
-    // Return string representation of the queue's linked list.
-    return this.linkedList.toString(callback);
+  toString(callback = (v) => v) {
+    return this.arr.reduce(
+      (acc, val, index) => `${acc}${index > 0 ? ',' : ''}${callback(val)}`,
+      ''
+    );
   }
 }
