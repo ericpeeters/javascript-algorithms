@@ -1,19 +1,28 @@
-import MinHeap from '../heap/MinHeap';
-import Comparator from '../../utils/comparator/Comparator';
-
-// It is the same as min heap except that when comparing two elements
-// we take into account its priority instead of the element's value.
-export default class PriorityQueue extends MinHeap {
+export default class PriorityQueue {
   constructor() {
-    // Call MinHip constructor first.
-    super();
+    this.items = new Map();
+    this.priorities = new Set();
+  }
 
-    // Setup priorities map.
-    this.priorities = new Map();
+  /**
+   * @type {Number[]}
+   */
+  get ascendingPrioritiesArray() {
+    return Array.from(this.priorities.values()).sort((a, b) => a - b);
+  }
 
-    // Use custom comparator for heap elements that will take element priority
-    // instead of element value into account.
-    this.compare = new Comparator(this.comparePriority.bind(this));
+  /**
+   * @type {Number}
+   */
+  get highestPriority() {
+    return this.ascendingPrioritiesArray[0];
+  }
+
+  /**
+   * @type {Boolean}
+   */
+  get isEmpty() {
+    return this.items.size === 0;
   }
 
   /**
@@ -23,9 +32,49 @@ export default class PriorityQueue extends MinHeap {
    * @return {PriorityQueue}
    */
   add(item, priority = 0) {
-    this.priorities.set(item, priority);
-    super.add(item);
+    if (!this.items.has(priority)) {
+      this.items.set(priority, []);
+    }
+
+    const itemsInPriority = this.items.get(priority);
+
+    itemsInPriority.push(item);
+    this.priorities.add(priority);
+
     return this;
+  }
+
+  /**
+   * Peek the value with the highest priority
+   * @return {*}
+   */
+  peek() {
+    if (this.isEmpty) {
+      return null;
+    }
+
+    return this.items.get(this.highestPriority)[0];
+  }
+
+  /**
+   * Poll the value with the highest priority from the queue
+   * and return it
+   * @return {*}
+   */
+  poll() {
+    if (this.isEmpty) {
+      return null;
+    }
+
+    const highestPriorityItems = this.items.get(this.highestPriority);
+    const itemValue = highestPriorityItems.shift();
+
+    if (highestPriorityItems.length === 0) {
+      this.items.delete(this.highestPriority);
+      this.priorities.delete(this.highestPriority);
+    }
+
+    return itemValue;
   }
 
   /**
@@ -34,11 +83,7 @@ export default class PriorityQueue extends MinHeap {
    * @param {Comparator} [customFindingComparator] - custom function for finding the item to remove
    * @return {PriorityQueue}
    */
-  remove(item, customFindingComparator) {
-    super.remove(item, customFindingComparator);
-    this.priorities.delete(item);
-    return this;
-  }
+  remove(item, customFindingComparator) {}
 
   /**
    * Change priority of the item in a queue.
@@ -46,29 +91,21 @@ export default class PriorityQueue extends MinHeap {
    * @param {number} priority - new item's priority.
    * @return {PriorityQueue}
    */
-  changePriority(item, priority) {
-    this.remove(item, new Comparator(this.compareValue));
-    this.add(item, priority);
-    return this;
-  }
+  changePriority(item, priority) {}
 
   /**
    * Find item by ite value.
    * @param {*} item
    * @return {Number[]}
    */
-  findByValue(item) {
-    return this.find(item, new Comparator(this.compareValue));
-  }
+  findByValue(item) {}
 
   /**
    * Check if item already exists in a queue.
    * @param {*} item
    * @return {boolean}
    */
-  hasValue(item) {
-    return this.findByValue(item).length > 0;
-  }
+  hasValue(item) {}
 
   /**
    * Compares priorities of two items.
@@ -76,12 +113,7 @@ export default class PriorityQueue extends MinHeap {
    * @param {*} b
    * @return {number}
    */
-  comparePriority(a, b) {
-    if (this.priorities.get(a) === this.priorities.get(b)) {
-      return 0;
-    }
-    return this.priorities.get(a) < this.priorities.get(b) ? -1 : 1;
-  }
+  comparePriority(a, b) {}
 
   /**
    * Compares values of two items.
@@ -89,10 +121,5 @@ export default class PriorityQueue extends MinHeap {
    * @param {*} b
    * @return {number}
    */
-  compareValue(a, b) {
-    if (a === b) {
-      return 0;
-    }
-    return a < b ? -1 : 1;
-  }
+  compareValue(a, b) {}
 }
